@@ -1,4 +1,4 @@
-package sort
+package arithmetic.sort
 
 import chisel3._
 

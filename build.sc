@@ -4,7 +4,7 @@ import mill.scalalib.scalafmt.ScalafmtModule
 
 val chiselVersion = "5.0.0"
 
-object sort extends SbtModule with ScalafmtModule {
+object arithmetic extends SbtModule with ScalafmtModule {
   override def millSourcePath = os.pwd
   def scalaVersion = "2.13.10"
   def scalacOptions = Seq(
