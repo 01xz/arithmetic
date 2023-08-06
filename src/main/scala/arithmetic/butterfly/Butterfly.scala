@@ -5,7 +5,7 @@ import chisel3.util._
 
 // Butterfly Network: https://en.wikipedia.org/wiki/Butterfly_network
 trait Butterfly[T <: Data] {
-  val op: (T, T) => (T, T)
+  def op(a: T, b: T): (T, T)
 
   private def layer(rank: Int, in: Seq[T]): Seq[T] = {
     require(rank <= log2Up(in.length))
