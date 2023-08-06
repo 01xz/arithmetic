@@ -21,7 +21,7 @@ trait Bitonic[T <: Data] extends Sort[T] with Butterfly[T] {
       .grouped(1 << index)
       .zipWithIndex
       .map { case (s, i) =>
-        if ((i & 1) == 1) butterfly(s) else butterfly(s).reverse
+        if ((i & 1) == 0) butterfly(s) else butterfly(s).reverse
       }
       .flatten
       .toSeq
