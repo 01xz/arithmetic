@@ -5,13 +5,13 @@ import chisel3.util._
 import arithmetic.butterfly.Butterfly
 
 trait Sort[T <: Data] {
-  def casOp(a: T, b: T): (T, T)
+  def casOp(in: (T, T)): (T, T)
   def sort(in: Seq[T]): Seq[T]
 }
 
 // Bitonic Sorter: https://en.wikipedia.org/wiki/Bitonic_sorter
 trait Bitonic[T <: Data] extends Sort[T] with Butterfly[T] {
-  def op(a: T, b: T) = casOp(a, b)
+  def op(in: (T, T)) = casOp(in)
 
   private def block(index: Int, in: Seq[T]): Seq[T] = {
     require(index <= log2Up(in.length))
