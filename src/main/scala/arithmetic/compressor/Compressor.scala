@@ -33,9 +33,9 @@ trait Compressor {
         val xor0  = a ^ b
         val xor1  = c ^ d
         val xor2  = xor1 ^ xor0
-        val cout  = (~xor0 & a) | (xor0 & c);
+        val cout  = (~xor0 & a) | (xor0 & c)
         val sum   = xor2 ^ cin
-        val carry = (~xor2 & d) | (xor2 & cin);
+        val carry = (~xor2 & d) | (xor2 & cin)
         Seq(sum, carry, cout)
       }
     }
