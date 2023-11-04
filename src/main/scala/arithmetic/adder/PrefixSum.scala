@@ -1,6 +1,7 @@
 package arithmetic.adder
 
 import chisel3._
+import chisel3.util.log2Up
 import chisel3.experimental.prefix
 
 trait PrefixSum {
