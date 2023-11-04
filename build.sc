@@ -10,8 +10,7 @@ object arithmetic extends SbtModule with ScalafmtModule {
     "-language:reflectiveCalls",
     "-deprecation",
     "-feature",
-    "-Xcheckinit",
-    "-P:chiselplugin:genBundleElements"
+    "-Xcheckinit"
   )
   def ivyDeps = Agg(
     ivy"org.chipsalliance::chisel::$chiselVersion"
