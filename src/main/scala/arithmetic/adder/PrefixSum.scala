@@ -35,6 +35,31 @@ trait LadnerFischerPrefixSum extends PrefixSum {
   def getPrefixSum() = layer(original, 1)
 }
 
+trait KoggeStonePrefixSum extends PrefixSum {
+  private def layer(elements: Seq[(Bool, Bool)], offset: Int): Seq[(Bool, Bool)] = {
+    val maxOffset = log2Up(elements.size)
+    require((elements.size & 1) == 0)
+    require(offset <= maxOffset)
+
+    val next = Seq.tabulate(elements.size) { i =>
+      val n = 1 << (offset - 1)
+      if (i < n) {
+        elements(i)
+      } else {
+        associativeOp(Seq(elements(i - n), elements(i)))
+      }
+    }
+
+    if (offset < maxOffset) {
+      layer(next, offset + 1)
+    } else {
+      next
+    }
+  }
+
+  def getPrefixSum() = layer(original, 1)
+}
+
 trait HanCarlsonPrefixSum extends PrefixSum {
   private def layer(elements: Seq[(Bool, Bool)], offset: Int): Seq[(Bool, Bool)] = {
     val maxOffset = log2Up(elements.size) + 1
