@@ -46,3 +46,5 @@ abstract class PrefixAdder(width: Int) extends Adder(width) with PrefixSum {
   io.cout := sum(width)
   io.sum  := sum(width - 1, 0)
 }
+
+class HanCarlsonPrefixAdder(width: Int) extends PrefixAdder(width) with HanCarlsonPrefixSum
