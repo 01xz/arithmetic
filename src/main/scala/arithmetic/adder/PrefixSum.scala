@@ -37,7 +37,7 @@ trait HanCarlsonPrefixSum extends PrefixSum {
       }
     }
 
-    if (offset < log2Up(elements.size) + 1) {
+    if (offset < maxOffset) {
       layer(next, offset + 1)
     } else {
       next
