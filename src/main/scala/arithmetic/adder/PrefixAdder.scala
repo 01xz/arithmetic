@@ -1,16 +1,14 @@
 package arithmetic.adder
 
 import chisel3._
+import chisel3.util.Cat
 import arithmetic.adder.PrefixSum
 
-trait PrefixAdder extends PrefixSum {
-  val lhs: UInt
-  val rhs: UInt
-  val cin: Bool
-
+abstract class PrefixAdder(width: Int) extends Adder(width) with PrefixSum {
+  val cin = io.cin
   val original = Seq.tabulate(width) { i =>
-    val generate  = dontTouch(lhs(i) & rhs(i)).suggestName(s"original_0_${i}_${i}_g")
-    val propagate = dontTouch(lhs(i) ^ rhs(i)).suggestName(s"original_0_${i}_${i}_p")
+    val generate  = dontTouch(io.lhs(i) & io.rhs(i)).suggestName(s"original_0_${i}_${i}_g")
+    val propagate = dontTouch(io.lhs(i) ^ io.rhs(i)).suggestName(s"original_0_${i}_${i}_p")
     (generate, propagate)
   }
 
@@ -25,16 +23,15 @@ trait PrefixAdder extends PrefixSum {
     }
   }
 
-  def getSum(): UInt = {
-    val prefixSum = getPrefixSum()
+  val prefixSum = getPrefixSum()
 
-    val carrys = cin +: Seq.tabulate(width) { i =>
-      prefixSum(i) match {
-        case (g: Bool, p: Bool) => g | (p & cin)
-      }
+  val carrys = cin +: Seq.tabulate(width) { i =>
+    prefixSum(i) match {
+      case (g: Bool, p: Bool) => g | (p & cin)
     }
+  }
 
-    VecInit
+  val sum = VecInit
     .tabulate(carrys.size) { i =>
       if (i < carrys.size - 1) {
         original(i) match {
@@ -45,5 +42,7 @@ trait PrefixAdder extends PrefixSum {
       }
     }
     .asUInt
-  }
+
+  io.cout := sum(width)
+  io.sum  := sum(width - 1, 0)
 }
