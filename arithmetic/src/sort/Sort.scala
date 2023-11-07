@@ -10,7 +10,7 @@ trait Sort[T <: Data] {
 }
 
 // Bitonic Sorter: https://en.wikipedia.org/wiki/Bitonic_sorter
-trait Bitonic[T <: Data] extends Sort[T] with Butterfly[T] {
+trait BitonicSort[T <: Data] extends Sort[T] with Butterfly[T] {
   def op(in: (T, T)) = casOp(in)
 
   private def block(index: Int, in: Seq[T]): Seq[T] = {
