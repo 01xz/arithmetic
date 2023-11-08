@@ -3,15 +3,14 @@ package arithmetic.butterfly
 import chisel3._
 import chisel3.util.{isPow2, log2Up}
 
-/** A trait representing a butterfly network.
-  * Butterfly Network: https://en.wikipedia.org/wiki/Butterfly_network
+/**
+  * Butterfly Network.
+  *
+  * @see [[https://en.wikipedia.org/wiki/Butterfly_network]]
   */
-trait Butterfly[T <: Data] {
-  def op(in: (T, T)): (T, T)
-
-  def butterfly(in: Seq[T]): Seq[T] = {
+object Butterfly {
+  def apply[T <: Data](in: Seq[T])(op: ((T, T)) => (T, T)): Seq[T] = {
     require(isPow2(in.length))
-
     (1 to log2Up(in.length)).foldLeft(in) { case (prev, rank) =>
       prev
         .grouped(prev.length >> (rank - 1))
