@@ -1,38 +1,31 @@
 package arithmetic.sort
 
 import chisel3._
-import chisel3.util._
+import chisel3.util.{isPow2, log2Up}
 import arithmetic.butterfly.Butterfly
 
-trait Sort[T <: Data] {
-  def casOp(in: (T, T)): (T, T)
-  def sort(in: Seq[T]): Seq[T]
-}
-
-// Bitonic Sorter: https://en.wikipedia.org/wiki/Bitonic_sorter
-trait BitonicSort[T <: Data] extends Sort[T] with Butterfly[T] {
-  def op(in: (T, T)) = casOp(in)
-
-  private def block(index: Int, in: Seq[T]): Seq[T] = {
-    require(index <= log2Up(in.length))
+/**
+  * Bitonic Sorter
+  *
+  * @see [[https://en.wikipedia.org/wiki/Bitonic_sorter]]
+  *
+  * @tparam T The type of data to be sorted.
+  * @param in The input sequence to be sorted.
+  * @param casOp The Compare-And-Swap operation.
+  * @return The sorted sequence.
+  */
+object BitonicSort {
+  def apply[T <: Data](in: Seq[T])(casOp: ((T, T)) => (T, T)): Seq[T] = {
     require(isPow2(in.length))
-
-    val next = in
-      .grouped(1 << index)
-      .zipWithIndex
-      .map { case (s, i) =>
-        if ((i & 1) == 0) butterfly(s) else butterfly(s).reverse
-      }
-      .flatten
-      .toSeq
-
-    if (index < log2Up(in.length))
-      block(index + 1, next)
-    else
-      next
-  }
-
-  def sort(in: Seq[T]): Seq[T] = {
-    block(1, in)
+    (1 to log2Up(in.length)).foldLeft(in) { case (prev, index) =>
+      prev
+        .grouped(1 << index)
+        .zipWithIndex
+        .map { case (group, i) =>
+          if ((i & 1) == 0) Butterfly(group)(casOp) else Butterfly(group)(casOp).reverse
+        }
+        .flatten
+        .toSeq
+    }
   }
 }
