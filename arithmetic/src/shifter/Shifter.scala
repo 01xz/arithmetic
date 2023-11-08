@@ -14,11 +14,11 @@ object BarrelShifter {
     require(shiftGranularity > 0)
     val elementType = chiselTypeOf(inputs.head)
     shamt.asBools.grouped(shiftGranularity).map(Cat(_)).zipWithIndex.foldLeft(inputs) {
-      case (prev, (shiftBits, layer)) =>
+      case (prev, (shiftBits, layerIndex)) =>
         Mux1H(
           UIntToOH(shiftBits),
           Seq.tabulate(1 << shiftBits.getWidth) { i =>
-            val layerShift: Int = (i * (1 << (layer * shiftGranularity))).min(prev.length)
+            val layerShift: Int = (i * (1 << (layerIndex * shiftGranularity))).min(prev.length)
             VecInit(shiftType match {
               case LeftShift =>
                 prev.drop(layerShift) ++ Seq.fill(layerShift)(0.U.asTypeOf(elementType))
