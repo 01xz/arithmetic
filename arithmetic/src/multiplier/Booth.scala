@@ -50,13 +50,14 @@ trait Booth {
       else Cat(true.B, ~sign, encoded, correction)
     }
 
-    def weight(i: Int) = if (i == 0) 0 else (i - 1) * 2
+    def weight(i: Int): Int = if (i == 0) 0 else (i - 1) * 2
 
     val cols = weight(pp.size - 1) + pp.last.getWidth
     Seq.tabulate(cols) { i =>
-      (0 until pp.size).collect {
-        case j if (i - weight(j) >= 0 && i - weight(j) < pp(j).getWidth) => pp(j)(i - weight(j))
-      }.toSeq
+      pp.zipWithIndex.collect {
+        case (row, j) if (i - weight(j) >= 0 && i - weight(j) < row.getWidth) =>
+          row(i - weight(j))
+      }
     }
   }
 }
