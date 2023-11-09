@@ -4,8 +4,7 @@ import chisel3._
 import chisel3.util.{isPow2, log2Up}
 import arithmetic.butterfly.Butterfly
 
-/**
-  * Bitonic Sorter
+/** Bitonic Sorter.
   *
   * @see [[https://en.wikipedia.org/wiki/Bitonic_sorter]]
   *

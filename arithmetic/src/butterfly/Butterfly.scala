@@ -3,8 +3,7 @@ package arithmetic.butterfly
 import chisel3._
 import chisel3.util.{isPow2, log2Up}
 
-/**
-  * Butterfly Network.
+/** Butterfly Network.
   *
   * @see [[https://en.wikipedia.org/wiki/Butterfly_network]]
   */
