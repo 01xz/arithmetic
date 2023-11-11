@@ -6,20 +6,18 @@ import chisel3.experimental.prefix
 import arithmetic.compressor.Compressor
 
 abstract class CarrySaveAdder(m: Int, n: Int)(width: Int) extends Module {
-  val io = IO(new Bundle {
-    val in  = Input(Vec(m, UInt(width.W)))
-    val out = Output(Vec(n, UInt(width.W)))
-  })
+  val in  = IO(Input(Vec(m, UInt(width.W))))
+  val out = IO(Output(Vec(n, UInt(width.W))))
 
   def compressor(in: Seq[Bool]): Seq[Bool]
 
   val compressed = Seq.tabulate(width) { i =>
     prefix(s"${i}") {
-      compressor(io.in.map(_(i)))
+      compressor(in.map(_(i)))
     }
   }
 
-  io.out := VecInit(compressed.transpose.map(_.reverse).map(Cat(_)))
+  out := VecInit(compressed.transpose.map(_.reverse).map(Cat(_)))
 }
 
 class CSA22(width: Int) extends CarrySaveAdder(2, 2)(width) with Compressor {
