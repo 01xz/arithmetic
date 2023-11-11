@@ -12,9 +12,10 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           deps = with pkgs; [
-            mill
             circt
+            mill
             verilator
+            z3
           ];
         in {
           legacyPackages = pkgs;
