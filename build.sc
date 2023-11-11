@@ -1,7 +1,7 @@
 import mill._
 import scalalib._
 
-val chiselVersion     = "6.0.0-M3"
+val chiselVersion     = "5.0.0"
 val chiseltestVersion = "5.0.2"
 
 object arithmetic extends ScalaModule with scalafmt.ScalafmtModule {
