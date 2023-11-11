@@ -5,10 +5,9 @@ import chisel3.util.Cat
 import arithmetic.adder.PrefixSum
 
 abstract class PrefixAdder(width: Int) extends Adder(width) with PrefixSum {
-  val cin = io.cin
   val original = Seq.tabulate(width) { i =>
-    val generate  = dontTouch(io.lhs(i) & io.rhs(i)).suggestName(s"original_0_${i}_${i}_g")
-    val propagate = dontTouch(io.lhs(i) ^ io.rhs(i)).suggestName(s"original_0_${i}_${i}_p")
+    val generate  = dontTouch(lhs(i) & rhs(i)).suggestName(s"original_0_${i}_${i}_g")
+    val propagate = dontTouch(lhs(i) ^ rhs(i)).suggestName(s"original_0_${i}_${i}_p")
     (generate, propagate)
   }
 
@@ -31,7 +30,7 @@ abstract class PrefixAdder(width: Int) extends Adder(width) with PrefixSum {
     }
   }
 
-  val sum = VecInit
+  val result = VecInit
     .tabulate(carrys.size) { i =>
       if (i < carrys.size - 1) {
         original(i) match {
@@ -43,8 +42,8 @@ abstract class PrefixAdder(width: Int) extends Adder(width) with PrefixSum {
     }
     .asUInt
 
-  io.cout := sum(width)
-  io.sum  := sum(width - 1, 0)
+  cout := result(width)
+  sum  := result(width - 1, 0)
 }
 
 class HanCarlsonPrefixAdder(width: Int) extends PrefixAdder(width) with HanCarlsonPrefixSum
