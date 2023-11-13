@@ -110,7 +110,7 @@ trait HanCarlsonPrefixSum extends PrefixSum {
           prefix(s"brent_kung_${offset}_${i}_${i - 1}") {
             associativeOp(Seq(elements(i - 1), elements(i)))
           }
-        case maxOffset if i > 1 && (i & 1) == 0 => // Brent-Kung
+        case j if j == maxOffset && i > 1 && (i & 1) == 0 => // Brent-Kung
           prefix(s"brent_kung_${offset}_${i}_${i - 1}") {
             associativeOp(Seq(elements(i - 1), elements(i)))
           }
