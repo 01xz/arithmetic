@@ -46,4 +46,10 @@ abstract class PrefixAdder(width: Int) extends Adder(width) with PrefixSum {
   sum  := result(width - 1, 0)
 }
 
+class LadnerFischerPrefixAdder(width: Int) extends PrefixAdder(width) with LadnerFischerPrefixSum
+
+class KoggeStonePrefixAdder(width: Int) extends PrefixAdder(width) with KoggeStonePrefixSum
+
+class BrentKungPrefixAdder(width: Int) extends PrefixAdder(width) with BrentKungPrefixSum
+
 class HanCarlsonPrefixAdder(width: Int) extends PrefixAdder(width) with HanCarlsonPrefixSum
