@@ -99,39 +99,28 @@ trait BrentKungPrefixSum extends PrefixSum {
 }
 
 trait HanCarlsonPrefixSum extends PrefixSum {
-  private def layer(elements: Seq[(Bool, Bool)], offset: Int): Seq[(Bool, Bool)] = {
-    val maxOffset = log2Up(elements.size) + 1
-    require((elements.size & 1) == 0)
-    require(offset <= maxOffset)
-
-    val next = Seq.tabulate(elements.size) { i =>
-      offset match {
-        case 1 if (i & 1) == 1 => // Brent-Kung
-          prefix(s"brent_kung_${offset}_${i}_${i - 1}") {
-            associativeOp(Seq(elements(i - 1), elements(i)))
-          }
-        case j if j == maxOffset && i > 1 && (i & 1) == 0 => // Brent-Kung
-          prefix(s"brent_kung_${offset}_${i}_${i - 1}") {
-            associativeOp(Seq(elements(i - 1), elements(i)))
-          }
-        case _ =>
-          val n = 1 << (offset - 1)
-          if ((i & 1) == 1 && i > n) { // Kogge-Stone
-            prefix(s"kogge_stone_${offset}_${i}_${i - n}") {
-              associativeOp(Seq(elements(i - n), elements(i)))
+  def getPrefixSum(): Seq[(Bool, Bool)] = {
+    val maxIndex = log2Up(original.size) + 1
+    (1 to maxIndex).foldLeft(original) { case (prev, index) =>
+      Seq.tabulate(prev.size) { i =>
+        index match {
+          case 1 if (i & 1) == 1 => // Brent-Kung
+            prefix(s"brent_kung_${index}_${i}_${i - 1}") {
+              associativeOp(Seq(prev(i - 1), prev(i)))
             }
-          } else {
-            elements(i)
-          }
+          case j if j == maxIndex && i > 1 && (i & 1) == 0 => // Brent-Kung
+            prefix(s"brent_kung_${index}_${i}_${i - 1}") {
+              associativeOp(Seq(prev(i - 1), prev(i)))
+            }
+          case _ =>
+            val n = 1 << (index - 1)
+            if ((i & 1) == 1 && i > n) // Kogge-Stone
+              prefix(s"kogge_stone_${index}_${i}_${i - n}") {
+                associativeOp(Seq(prev(i - n), prev(i)))
+              }
+            else prev(i)
+        }
       }
     }
-
-    if (offset < maxOffset) {
-      layer(next, offset + 1)
-    } else {
-      next
-    }
   }
-
-  def getPrefixSum() = layer(original, 1)
 }
