@@ -11,91 +11,63 @@ trait PrefixSum {
 }
 
 trait LadnerFischerPrefixSum extends PrefixSum {
-  private def layer(elements: Seq[(Bool, Bool)], offset: Int): Seq[(Bool, Bool)] = {
-    val maxOffset = log2Up(elements.size)
-    require((elements.size & 1) == 0)
-    require(offset <= maxOffset)
-
-    val next = Seq.tabulate(elements.size) { i =>
-      val n = i >> (offset - 1)
-      if ((n & 1) == 1) {
-        val f = (n << (offset - 1)) - 1
-        associativeOp(Seq(elements(f), elements(i)))
-      } else {
-        elements(i)
+  def getPrefixSum(): Seq[(Bool, Bool)] = {
+    (1 to log2Up(original.size)).foldLeft(original) { case (prev, index) =>
+      Seq.tabulate(prev.size) { i =>
+        val n = i >> (index - 1)
+        if ((n & 1) == 1) {
+          val f = (n << (index - 1)) - 1
+          prefix(s"ladner_fischer_${index}_${i}_${f}") {
+            associativeOp(Seq(prev(f), prev(i)))
+          }
+        } else prev(i)
       }
     }
-
-    if (offset < maxOffset) {
-      layer(next, offset + 1)
-    } else {
-      next
-    }
   }
-
-  def getPrefixSum() = layer(original, 1)
 }
 
 trait KoggeStonePrefixSum extends PrefixSum {
-  private def layer(elements: Seq[(Bool, Bool)], offset: Int): Seq[(Bool, Bool)] = {
-    val maxOffset = log2Up(elements.size)
-    require((elements.size & 1) == 0)
-    require(offset <= maxOffset)
-
-    val next = Seq.tabulate(elements.size) { i =>
-      val n = 1 << (offset - 1)
-      if (i < n) {
-        elements(i)
-      } else {
-        associativeOp(Seq(elements(i - n), elements(i)))
+  def getPrefixSum(): Seq[(Bool, Bool)] = {
+    (1 to log2Up(original.size)).foldLeft(original) { case (prev, index) =>
+      Seq.tabulate(prev.size) { i =>
+        val n = 1 << (index - 1)
+        if (i < n) prev(i)
+        else
+          prefix(s"kogge_stone_${index}_${i}_${i - n}") {
+            associativeOp(Seq(prev(i - n), prev(i)))
+          }
       }
     }
-
-    if (offset < maxOffset) {
-      layer(next, offset + 1)
-    } else {
-      next
-    }
   }
-
-  def getPrefixSum() = layer(original, 1)
 }
 
 trait BrentKungPrefixSum extends PrefixSum {
-  private def layer(elements: Seq[(Bool, Bool)], offset: Int): Seq[(Bool, Bool)] = {
-    val maxOffset = log2Up(elements.size) * 2 - 1
-    require((elements.size & 1) == 0)
-    require(offset <= maxOffset)
-
-    val next = Seq.tabulate(elements.size) { i =>
-      if (offset > log2Up(elements.size)) {
-        val n = log2Up(elements.size) * 2 - offset
-        val m = (1 << n) - 1
-        if (i > m && ((i - (1 << (n - 1))) & m) == m) {
-          val f = i - (1 << (n - 1))
-          associativeOp(Seq(elements(f), elements(i)))
-        } else {
-          elements(i)
-        }
-      } else {
-        val m = (1 << offset) - 1
-        if ((i & m) == m) {
-          val f = i - (1 << (offset - 1))
-          associativeOp(Seq(elements(f), elements(i)))
-        } else {
-          elements(i)
+  def getPrefixSum(): Seq[(Bool, Bool)] = {
+    val maxIndex = log2Up(original.size) * 2 - 1
+    (1 to maxIndex).foldLeft(original) { case (prev, index) =>
+      Seq.tabulate(prev.size) { i =>
+        index match {
+          case j if j > log2Up(original.size) =>
+            val n = log2Up(original.size) * 2 - j
+            val m = (1 << n) - 1
+            if (i > m && ((i - (1 << (n - 1))) & m) == m) {
+              val f = i - (1 << (n - 1))
+              prefix(s"brent_kung_${index}_${i}_${f}") {
+                associativeOp(Seq(prev(f), prev(i)))
+              }
+            } else prev(i)
+          case _ =>
+            val m = (1 << index) - 1
+            if ((i & m) == m) {
+              val f = i - (1 << (index - 1))
+              prefix(s"brent_kung_${index}_${i}_${f}") {
+                associativeOp(Seq(prev(f), prev(i)))
+              }
+            } else prev(i)
         }
       }
     }
-
-    if (offset < maxOffset) {
-      layer(next, offset + 1)
-    } else {
-      next
-    }
   }
-
-  def getPrefixSum() = layer(original, 1)
 }
 
 trait HanCarlsonPrefixSum extends PrefixSum {
