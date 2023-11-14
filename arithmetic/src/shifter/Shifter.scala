@@ -1,14 +1,14 @@
 package arithmetic.shift
 
 import chisel3._
-import chisel3.util.{Cat, Mux1H, UIntToOH}
+import chisel3.util.{Cat, Fill, Mux1H, UIntToOH}
 
 object BarrelShifter {
-  private trait ShiftType
-  private object LeftShift   extends ShiftType
-  private object RightShift  extends ShiftType
-  private object LeftRotate  extends ShiftType
-  private object RightRotate extends ShiftType
+  trait ShiftType
+  object LeftShift   extends ShiftType
+  object RightShift  extends ShiftType
+  object LeftRotate  extends ShiftType
+  object RightRotate extends ShiftType
 
   def apply[T <: Data](inputs: Vec[T], shamt: UInt, shiftType: ShiftType, shiftGranularity: Int = 1): Vec[T] = {
     require(shiftGranularity > 0)
@@ -31,6 +31,21 @@ object BarrelShifter {
             })
           }
         )
+    }
+  }
+
+  def apply(input: UInt, shamt: UInt, lr: Bool, la: Bool): UInt = {
+    shamt.asBools.zipWithIndex.foldLeft(input) { case (prev, (doShift, index)) =>
+      val sign                               = input.head(1) & la
+      val layerShift                         = 1 << index
+      val (leftShift, rightShift, doNothing) = (~lr & doShift, lr & doShift, ~doShift)
+      Mux1H(
+        Seq(
+          leftShift  -> Cat(prev.tail(layerShift), Fill(layerShift, false.B)),
+          rightShift -> Cat(Fill(layerShift, sign), prev.head(prev.getWidth - layerShift)),
+          doNothing  -> prev
+        )
+      )
     }
   }
 }
