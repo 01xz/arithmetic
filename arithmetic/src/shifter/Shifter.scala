@@ -1,7 +1,7 @@
 package arithmetic.shift
 
 import chisel3._
-import chisel3.util.{Cat, Fill, Mux1H, UIntToOH}
+import chisel3.util.{log2Up, Cat, Fill, Mux1H, UIntToOH}
 
 object BarrelShifter {
   trait ShiftType
@@ -35,6 +35,7 @@ object BarrelShifter {
   }
 
   def apply(input: UInt, shamt: UInt, lr: Bool, la: Bool): UInt = {
+    require(shamt.getWidth <= log2Up(input.getWidth))
     shamt.asBools.zipWithIndex.foldLeft(input) { case (prev, (doShift, index)) =>
       val sign                               = input.head(1) & la
       val layerShift                         = 1 << index
