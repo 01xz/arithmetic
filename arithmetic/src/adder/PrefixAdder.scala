@@ -22,7 +22,7 @@ abstract class PrefixAdder(width: Int) extends Adder(width) with PrefixSum {
     }
   }
 
-  val prefixSum = getPrefixSum()
+  val prefixSum = getPrefixSumOf(original)
 
   val carrys = cin +: Seq.tabulate(width) { i =>
     prefixSum(i) match {

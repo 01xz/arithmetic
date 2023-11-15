@@ -5,14 +5,13 @@ import chisel3.util.log2Up
 import chisel3.experimental.prefix
 
 trait PrefixSum {
-  val original: Seq[(Bool, Bool)]
   def associativeOp(elements: Seq[(Bool, Bool)]): (Bool, Bool)
-  def getPrefixSum(): Seq[(Bool, Bool)]
+  def getPrefixSumOf(orig: Seq[(Bool, Bool)]): Seq[(Bool, Bool)]
 }
 
 trait LadnerFischerPrefixSum extends PrefixSum {
-  def getPrefixSum(): Seq[(Bool, Bool)] = {
-    (1 to log2Up(original.size)).foldLeft(original) { case (prev, index) =>
+  def getPrefixSumOf(orig: Seq[(Bool, Bool)]): Seq[(Bool, Bool)] = {
+    (1 to log2Up(orig.size)).foldLeft(orig) { case (prev, index) =>
       Seq.tabulate(prev.size) { i =>
         val n = i >> (index - 1)
         if ((n & 1) == 1) {
@@ -27,8 +26,8 @@ trait LadnerFischerPrefixSum extends PrefixSum {
 }
 
 trait KoggeStonePrefixSum extends PrefixSum {
-  def getPrefixSum(): Seq[(Bool, Bool)] = {
-    (1 to log2Up(original.size)).foldLeft(original) { case (prev, index) =>
+  def getPrefixSumOf(orig: Seq[(Bool, Bool)]): Seq[(Bool, Bool)] = {
+    (1 to log2Up(orig.size)).foldLeft(orig) { case (prev, index) =>
       Seq.tabulate(prev.size) { i =>
         val n = 1 << (index - 1)
         if (i < n) prev(i)
@@ -42,13 +41,13 @@ trait KoggeStonePrefixSum extends PrefixSum {
 }
 
 trait BrentKungPrefixSum extends PrefixSum {
-  def getPrefixSum(): Seq[(Bool, Bool)] = {
-    val maxIndex = log2Up(original.size) * 2 - 1
-    (1 to maxIndex).foldLeft(original) { case (prev, index) =>
+  def getPrefixSumOf(orig: Seq[(Bool, Bool)]): Seq[(Bool, Bool)] = {
+    val maxIndex = log2Up(orig.size) * 2 - 1
+    (1 to maxIndex).foldLeft(orig) { case (prev, index) =>
       Seq.tabulate(prev.size) { i =>
         index match {
-          case j if j > log2Up(original.size) =>
-            val n = log2Up(original.size) * 2 - j
+          case j if j > log2Up(orig.size) =>
+            val n = log2Up(orig.size) * 2 - j
             val m = (1 << n) - 1
             if (i > m && ((i - (1 << (n - 1))) & m) == m) {
               val f = i - (1 << (n - 1))
@@ -71,9 +70,9 @@ trait BrentKungPrefixSum extends PrefixSum {
 }
 
 trait HanCarlsonPrefixSum extends PrefixSum {
-  def getPrefixSum(): Seq[(Bool, Bool)] = {
-    val maxIndex = log2Up(original.size) + 1
-    (1 to maxIndex).foldLeft(original) { case (prev, index) =>
+  def getPrefixSumOf(orig: Seq[(Bool, Bool)]): Seq[(Bool, Bool)] = {
+    val maxIndex = log2Up(orig.size) + 1
+    (1 to maxIndex).foldLeft(orig) { case (prev, index) =>
       Seq.tabulate(prev.size) { i =>
         index match {
           case 1 if (i & 1) == 1 => // Brent-Kung
