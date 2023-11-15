@@ -4,10 +4,11 @@ import chisel3._
 import chisel3.util._
 
 trait Booth {
-  val lhs: UInt
-  val rhs: UInt
+  def getPartialProductOf(lhs: UInt, rhs: UInt): Seq[Seq[Bool]]
+}
 
-  def getPartialProduct(): Seq[Seq[Bool]] = {
+trait Radix4Booth extends Booth {
+  def getPartialProductOf(lhs: UInt, rhs: UInt): Seq[Seq[Bool]] = {
     val signExt   = Cat(lhs.head(1), lhs)
     val double    = Cat(lhs, false.B)
     val neg       = ~signExt
