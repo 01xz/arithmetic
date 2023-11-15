@@ -5,8 +5,6 @@ import chisel3.util._
 import scala.collection.mutable.Buffer
 
 trait WallaceTree {
-  val original: Seq[Seq[Bool]]
-
   def c32(in: Seq[Bool]): Seq[Bool]
   def c22(in: Seq[Bool]): Seq[Bool]
 
@@ -15,7 +13,7 @@ trait WallaceTree {
     if (rows == 2)
       cur
     else {
-      val next = Buffer.fill(original.size)(Buffer[Bool]())
+      val next = Buffer.fill(cur.size)(Buffer[Bool]())
       cur.zipWithIndex.filter(_._1.size > 0).foreach { case (col, i) =>
         val (toCompress, remaining) = col.grouped(3).toSeq.partition(_.size == 3)
         val compressed = toCompress.map { case Seq(a, b, c) =>
@@ -36,8 +34,8 @@ trait WallaceTree {
     }
   }
 
-  def getTwoOperands(): Vec[UInt] = VecInit {
-    val padded = compress(original).map(_.padTo(2, false.B))
+  def getTwoOperandsOf(pp: Seq[Seq[Bool]]): Vec[UInt] = VecInit {
+    val padded = compress(pp).map(_.padTo(2, false.B))
     padded.transpose.map(_.reverse).map(Cat(_))
   }
 }
