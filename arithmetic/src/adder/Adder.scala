@@ -14,3 +14,14 @@ abstract class Adder(width: Int) extends Module {
   val cout     = IO(Output(Bool()))
   assert(Cat(cout, sum) === lhs +& rhs + cin)
 }
+
+/** An abstract class representing a multi-operand adder module.
+  *
+  * @param n the number of inputs to the adder.
+  * @param width the bit width of each input.
+  */
+abstract class MOAdder(n: Int, width: Int) extends Module {
+  val inputs = IO(Input(Vec(n, UInt(width.W))))
+  val sum    = IO(Output(UInt()))
+  assert(sum === inputs.reduceTree(_ + _))
+}
