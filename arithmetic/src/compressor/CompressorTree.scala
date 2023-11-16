@@ -9,9 +9,6 @@ trait CompressorTree {
 }
 
 trait WallaceTree extends CompressorTree with Compressor {
-  def c32(in: Seq[Bool]): Seq[Bool]
-  def c22(in: Seq[Bool]): Seq[Bool]
-
   def compress(cur: Seq[Seq[Bool]]): Seq[Seq[Bool]] = {
     val rows = cur.map(_.length).max
     if (rows == 2)
