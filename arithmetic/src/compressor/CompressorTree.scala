@@ -4,7 +4,11 @@ import chisel3._
 import chisel3.util._
 import scala.collection.mutable.Buffer
 
-trait WallaceTree {
+trait CompressorTree {
+  def getTwoOperandsOf(bm: Seq[Seq[Bool]]): Vec[UInt]
+}
+
+trait WallaceTree extends CompressorTree with Compressor {
   def c32(in: Seq[Bool]): Seq[Bool]
   def c22(in: Seq[Bool]): Seq[Bool]
 
@@ -34,8 +38,8 @@ trait WallaceTree {
     }
   }
 
-  def getTwoOperandsOf(pp: Seq[Seq[Bool]]): Vec[UInt] = VecInit {
-    val padded = compress(pp).map(_.padTo(2, false.B))
+  def getTwoOperandsOf(bm: Seq[Seq[Bool]]): Vec[UInt] = VecInit {
+    val padded = compress(bm).map(_.padTo(2, false.B))
     padded.transpose.map(_.reverse).map(Cat(_))
   }
 }
