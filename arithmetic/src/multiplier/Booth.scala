@@ -15,9 +15,9 @@ trait Radix4Booth extends Booth {
     val negDouble = Cat(neg.tail(1), false.B)
 
     val rows      = (rhs.getWidth + 2) / 2
-    val rhsPadded = Wire(UInt((rows * 2 + 1).W))
+    val rhsPadded = Wire(SInt((rows * 2 + 1).W))
 
-    rhsPadded := Cat(rhs, false.B)
+    rhsPadded := Cat(rhs, false.B).asSInt
 
     val pp = Seq.tabulate(rows) { i =>
       val curMatched = rhsPadded(i * 2 + 2, i * 2)
