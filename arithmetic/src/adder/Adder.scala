@@ -3,7 +3,7 @@ package arithmetic.adder
 import chisel3._
 import chisel3.util.Cat
 
-/** An abstract class representing an adder module.
+/** An abstract adder module.
   *
   * @param width The bit width of the adder.
   */
@@ -15,7 +15,7 @@ abstract class Adder(width: Int) extends Module {
   assert(Cat(cout, sum) === lhs +& rhs + cin)
 }
 
-/** An abstract class representing a multi-operand adder module.
+/** An abstract multi-operand adder module.
   *
   * @param n the number of inputs to the adder.
   * @param width the bit width of each input.
