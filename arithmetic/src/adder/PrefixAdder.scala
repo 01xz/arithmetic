@@ -1,7 +1,6 @@
 package arithmetic.adder
 
 import chisel3._
-import chisel3.util.Cat
 import arithmetic.adder.PrefixSum
 
 abstract class PrefixAdder(width: Int) extends Adder(width) with PrefixSum {
